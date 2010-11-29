@@ -198,6 +198,7 @@ class TestDescription(unittest.TestCase):
         self.assertEqual(self.desc.depends, ['>=sci-mathematics/octave-3.0.0'])
         self.assertEqual(self.desc.autoload, 'NO')
         self.assertEqual(self.desc.license, 'GPL version 3 or later')
+        self.assertEqual(self.desc.sha1sum(), '6538f6e7cd4515ef38e04a9b62da4bebb7496b51')
 
     def tearDown(self):
         # removing the temp tree

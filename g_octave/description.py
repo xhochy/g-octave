@@ -33,6 +33,7 @@ from contextlib import closing
 from .config import Config
 from .exception import ConfigException, DescriptionException
 from .compat import py3k
+from .checksum import sha1_compute
 
 if py3k:
     import urllib.request as urllib
@@ -61,6 +62,8 @@ class Description(object):
         if not os.path.exists(file):
             log.error('File not found: %s' % file)
             raise DescriptionException('File not found: %s' % file)
+
+        self._file = file
 
         # dictionary with the parsed content of the DESCRIPTION file
         self._desc = dict()
@@ -257,6 +260,10 @@ class Description(object):
                 raise DescriptionException('Invalid dependency atom: %s' % depend)
 
         return depends_list
+
+
+    def sha1sum(self):
+        return sha1_compute(self._file)
 
 
     def __getattr__(self, name):
