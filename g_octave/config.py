@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """
-    config.py
-    ~~~~~~~~~
+    g_octave.config
+    ~~~~~~~~~~~~~~~
 
     This module implements a Python object to handle the configuration
     of g-octave.
@@ -48,7 +48,6 @@ class Config(object):
 
 
     def __init__(self, config_file=None):
-
         # config Parser
         self._config = configparser.ConfigParser(self._defaults)
         
@@ -57,7 +56,6 @@ class Config(object):
         
         # no configuration file provided as parameter
         if config_file is None:
-            
             # we just want one of the following configuration files:
             # '../etc/g-octave.cfg', '/etc/g-octave.cfg'
             available_files = [
