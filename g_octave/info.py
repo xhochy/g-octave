@@ -40,7 +40,7 @@ class Info(object):
             with open(filename) as fp:
                 from_json = json.load(fp)
         except:
-            raise InfoException('Failed to open file: %r' % filename)
+            raise InfoException('Failed to load JSON file: %r' % filename)
         else:
             if 'dependencies' in from_json:
                 self.dependencies = from_json['dependencies']
