@@ -12,19 +12,21 @@
 """
 
 from __future__ import absolute_import
-
-__all__ = ['Config']
-
-import json
 import os
 
-from .compat import py3k, open
-from .exception import ConfigException
-
+# py3k compatibility
+from .compat import py3k
 if py3k:
     import configparser
 else:
     import ConfigParser as configparser
+
+__all__ = ['Config', 'ConfigException']
+
+
+class ConfigException(Exception):
+    pass
+
 
 class Config(object):
 
@@ -42,61 +44,59 @@ class Config(object):
     }
 
     _section_name = 'main'
-    _env_namespace = 'GOCTAVE_'
+    _environ_namespace = 'GOCTAVE_'
 
-    def __init__(self, fetch_phase=False, config_file=None, create_dirs=True):
 
-        # Config Parser
+    def __init__(self, config_file=None):
+
+        # config Parser
         self._config = configparser.ConfigParser(self._defaults)
-
-        self._fetch_phase = fetch_phase
-
-        parsed_files = self._config.read([
-            os.path.join(
-                os.path.dirname(os.path.abspath(__file__)),
-                '..', 'etc', 'g-octave.cfg'
-            ),
-            config_file or '/etc/g-octave.cfg',
-        ])
-
+        
+        # current directory
+        cwd = os.path.dirname(os.path.realpath(__file__))
+        
+        # no configuration file provided as parameter
+        if config_file is None:
+            
+            # we just want one of the following configuration files:
+            # '../etc/g-octave.cfg', '/etc/g-octave.cfg'
+            available_files = [
+                os.path.join(cwd, '..', 'etc', 'g-octave.cfg'),
+                os.path.join('/etc', 'g-octave.cfg'),
+            ]
+            
+            # get the first one available
+            for my_file in available_files:
+                if os.path.exists(my_file):
+                    config_file = my_file
+                    break
+        
+        # parse the wanted file using ConfigParser
+        parsed_files = self._config.read(config_file)
+        
+        # no file to parsed
         if len(parsed_files) == 0:
-            raise ConfigException('Configuration file not found.')
+            raise ConfigException('File not found: %r' % config_file)
 
-        _db = self._getattr('db')
-        _overlay = self._getattr('overlay')
+    def _evaluate_from_file(self, attr):
+        # return the value from the configuration file
+        try:
+            return self._config.get(self._section_name, attr)
+        except (configparser.NoSectionError, configparser.NoOptionError):
+            return None
 
-        for dir in [_db, _overlay]:
-            if not os.path.exists(dir) and create_dirs:
-                try:
-                    os.makedirs(dir, 0o755)
-                except:
-                    # it's probably safe to ignore that
-                    pass
-
-        self._cache = {}
-        self._info = {}
-
-        if not fetch_phase:
-
-            # JSON
-            json_file = os.path.join(_db, 'info.json')
-            with open(json_file) as fp:
-                self._info = json.load(fp)
-
+    def _evaluate_from_environ(self, attr):
+        # return the value from the environment variables namespace
+        return os.environ.get(self._environ_namespace + attr.upper(), None)
 
     def __getattr__(self, attr):
-
+        # valid attribute?
         if attr in self._defaults:
-            return self._getattr(attr)
-        elif attr in self._info:
-            return self._info[attr]
+            # try the environment variable first
+            from_env = self._evaluate_from_environ(attr)
+            if from_env is not None:
+                return from_env
+            # default to the configuration file
+            return self._evaluate_from_file(attr)
         else:
-            raise ConfigException('Invalid option: %s' % attr)
-
-
-    def _getattr(self, attr):
-        from_env = os.environ.get(self._env_namespace + attr.upper(), None)
-        if from_env is None:
-            return self._config.get(self._section_name, attr)
-        return from_env
-
+            raise ConfigException('Invalid option: %r' % attr)

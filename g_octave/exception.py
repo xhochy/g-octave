@@ -12,16 +12,12 @@
 """
 
 __all__ = [
-    'ConfigException',
     'DescriptionException',
     'DescriptionTreeException',
     'EbuildException',
     'FetchException',
 ]
 
-
-class ConfigException(Exception):
-    pass
 
 class DescriptionException(Exception):
     pass
