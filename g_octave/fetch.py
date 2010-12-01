@@ -20,6 +20,7 @@ __all__ = ['fetch']
 from .config import Config
 conf = Config(True) # fetch phase
 
+from .description_tree import DescriptionTree
 from .exception import FetchException
 from .compat import py3k, open as open_
 
@@ -40,7 +41,7 @@ import tarfile
 from contextlib import closing
 
 def clean_db():
-    for f in ['timestamp', 'info.json', 'patches', 'octave-forge']:
+    for f in ['timestamp', 'info.json', 'patches', 'octave-forge', 'manifest.json']:
         current = os.path.join(conf.db, f)
         if os.path.isdir(current):
             shutil.rmtree(current)

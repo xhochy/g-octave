@@ -15,6 +15,7 @@ from __future__ import print_function
 
 import datetime
 import feedparser
+import json
 import optparse
 import os
 import re
@@ -32,6 +33,8 @@ if os.path.exists(os.path.join(current_dir, '..', 'g_octave')):
     sys.path.insert(0, os.path.join(current_dir, '..'))
 
 from g_octave import description_tree
+from g_octave.checksum import sha1_compute
+
 
 class Git:
 
@@ -63,6 +66,25 @@ class SfUpdates:
         if self.feed.bozo == 1:
             raise self.feed.bozo_exception
         self.entries = self.feed.entries
+        self._db = description_tree.DescriptionTree()
+
+    def _compute_manifest(self, db_dir):
+        manifest = {}
+        for category in self._db.pkg_list:
+            for pkg in self._db.pkg_list[category]:
+                description = os.path.join(
+                    db_dir,
+                    'octave-forge',
+                    self._db.categories[pkg['name']],
+                    pkg['name'],
+                    '%s-%s.DESCRIPTION' % (pkg['name'], pkg['version'])
+                )
+                manifest[pkg['name']+'-'+pkg['version']] = sha1_compute(description)
+        try:
+            with open(os.path.join(self._repo_dir, 'manifest.json'), 'w') as fp:
+                json.dump(manifest, fp, indent=2, sort_keys=True)
+        except:
+            pass
 
     def _save_timestamp(self):
         try:
@@ -109,14 +131,13 @@ class SfUpdates:
         #   version,
         #   category
         # }
-        db = description_tree.DescriptionTree()
         entries = {}
-        for category in db.pkg_list:
-            for pkg in db.pkg_list[category]:
+        for category in self._db.pkg_list:
+            for pkg in self._db.pkg_list[category]:
                 entries['%s-%s.tar.gz' % (pkg['name'], pkg['version'])] = {
                     'name': pkg['name'],
                     'version': pkg['version'],
-                    'category': unicode(db.categories[pkg['name']]),
+                    'category': unicode(self._db.categories[pkg['name']]),
                 }
         return entries
 
@@ -194,6 +215,7 @@ class SfUpdates:
                     with closing(src_tar.extractfile(f)) as fp_tar:
                         with open(description, 'w') as fp:
                             shutil.copyfileobj(fp_tar, fp)
+        self._compute_manifest(db_dir)
         self._save_timestamp()
 
 

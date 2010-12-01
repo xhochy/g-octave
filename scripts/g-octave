@@ -48,6 +48,8 @@ current_dir = os.path.dirname(os.path.realpath(__file__))
 if os.path.exists(os.path.join(current_dir, '..', 'g_octave')):
     sys.path.insert(0, os.path.join(current_dir, '..'))
 
+from g_octave.checksum import sha1_check_db
+from g_octave.description_tree import DescriptionTree
 from g_octave.log import Log
 log = Log('g-octave')
 
@@ -281,7 +283,14 @@ def main():
                 log.info('No updates available')
                 out.einfo('No updates available')
             updates.extract()
-
+            
+            log.info('Checking SHA1 checksums ...')
+            out.ebegin('Checking SHA1 checksums ...')
+            if sha1_check_db(DescriptionTree()):
+                out.eend(0)
+            else:
+                out.eend(1)
+            
             return os.EX_OK
     else:
         log.info('You can\'t fetch package databases.')
@@ -293,7 +302,6 @@ def main():
     conf = Config()
 
     from g_octave.description import Description
-    from g_octave.description_tree import DescriptionTree
     from g_octave.ebuild import Ebuild, EbuildException
     from g_octave.overlay import create_overlay
 
