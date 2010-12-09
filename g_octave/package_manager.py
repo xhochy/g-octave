@@ -26,7 +26,7 @@ from g_octave.config import Config
 from g_octave.ebuild import Ebuild
 from g_octave.compat import open
 
-conf = Config(True)
+conf = Config()
 
 class Base:
     

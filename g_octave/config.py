@@ -57,10 +57,10 @@ class Config(object):
         # no configuration file provided as parameter
         if config_file is None:
             # we just want one of the following configuration files:
-            # '../etc/g-octave.cfg', '/etc/g-octave.cfg'
+            # '/etc/g-octave.cfg', '../etc/g-octave.cfg'
             available_files = [
-                os.path.join(cwd, '..', 'etc', 'g-octave.cfg'),
                 os.path.join('/etc', 'g-octave.cfg'),
+                os.path.join(cwd, '..', 'etc', 'g-octave.cfg'),
             ]
             
             # get the first one available

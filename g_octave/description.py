@@ -31,9 +31,10 @@ import tempfile
 from contextlib import closing
 
 from .config import Config
-from .exception import ConfigException, DescriptionException
 from .compat import py3k
 from .checksum import sha1_compute
+from .exception import DescriptionException
+from .info import Info
 
 if py3k:
     import urllib.request as urllib
@@ -43,6 +44,8 @@ else:
 from .log import Log
 log = Log('g_octave.description')
 
+conf = Config()
+
 # octave-forge DESCRIPTION's dependencies atoms
 re_depends = re.compile(r'^([a-zA-Z0-9-]+) *(\( *([><=]?=?) *([0-9.]+) *\))?')
 
@@ -51,19 +54,17 @@ re_pkg_atom = re.compile(r'^(.+)-([0-9.]+)$')
 
 class Description(object):
 
-    def __init__(self, file, conf=None, parse_sysreq=True):
+    def __init__(self, file, parse_sysreq=True):
         
         log.info('Parsing file: %s' % file)
-        
-        if conf is None:
-            conf = Config()
-        self._config = conf
 
         if not os.path.exists(file):
             log.error('File not found: %s' % file)
             raise DescriptionException('File not found: %s' % file)
 
         self._file = file
+
+        self._info = Info(os.path.join(conf.db, 'info.json'))
 
         # dictionary with the parsed content of the DESCRIPTION file
         self._desc = dict()
@@ -151,7 +152,7 @@ class Description(object):
             # license
             if key == 'license':
                 try:
-                    new_license = self._config.licenses.get(self._desc['license'])
+                    new_license = self._info.licenses.get(self._desc['license'])
                 except:
                     new_license = ''
                 if new_license not in [None, '']:
@@ -194,20 +195,15 @@ class Description(object):
                     else:
                         atom += comparator
 
-                try:
-                    conf_dependencies = self._config.dependencies
-                except ConfigException:
-                    conf_dependencies = {}
-
                 # as octave is already in the portage tree, the atom is
                 # predefined.
                 if name.lower() == 'octave':
                     atom += 'sci-mathematics/octave'
 
-                elif name in conf_dependencies:
-                    if conf_dependencies[name] == '':
+                elif name in self._info.dependencies:
+                    if self._info.dependencies[name] == '':
                         continue
-                    atom += conf_dependencies[name]
+                    atom += self._info.dependencies[name]
 
                 # the octave-forge packages will be put inside a "fake"
                 # category: g-octave
@@ -291,5 +287,5 @@ class SvnDescription(Description):
                     shutil.copyfileobj(fp, fp_)
         except:
             raise DescriptionException('Failed to fetch DESCRIPTION file from SVN')
-        Description.__init__(self, temp_desc, parse_sysreq=True)
+        Description.__init__(self, temp_desc)
         os.unlink(temp_desc)

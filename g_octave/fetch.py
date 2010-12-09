@@ -18,7 +18,7 @@ from __future__ import absolute_import, print_function
 __all__ = ['fetch']
 
 from .config import Config
-conf = Config(True) # fetch phase
+conf = Config()
 
 from .description_tree import DescriptionTree
 from .exception import FetchException

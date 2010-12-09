@@ -208,7 +208,7 @@ def main():
     from g_octave.config import Config
     from g_octave.fetch import fetch
 
-    conf_prefetch = Config(True)
+    conf_prefetch = Config()
 
     if options.config:
         try:
@@ -441,6 +441,7 @@ def main():
 
 if __name__ == '__main__':
 
+    from g_octave.config import ConfigException
     from g_octave.exception import *
 
     return_code = os.EX_OK

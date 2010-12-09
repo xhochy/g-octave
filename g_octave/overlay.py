@@ -20,8 +20,7 @@ import sys
 import shutil
 import portage.output
 
-from .config import Config
-from .exception import ConfigException
+from .config import Config, ConfigException
 from .compat import open
 
 out = portage.output.EOutput()

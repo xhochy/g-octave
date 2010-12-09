@@ -21,9 +21,9 @@ import re
 
 from portage.versions import vercmp
 
-from .config import Config
+from .config import Config, ConfigException
 from .description import *
-from .exception import ConfigException, DescriptionTreeException
+from .exception import DescriptionTreeException
 from .log import Log
 log = Log('g_octave.description_tree')
 
@@ -77,15 +77,10 @@ class DescriptionTree(object):
                     for desc_file in os.listdir(pkgdir):
                         pkg_p = desc_file[:-len('.DESCRIPTION')]
                         mypkg = re_pkg_atom.match(pkg_p)
-                        if mypkg == None:
+                        if mypkg is None:
                             log.error('Invalid Atom: %s' % mypkg)
                             raise DescriptionTreeException('Invalid Atom: %s' % mypkg)
-                        try:
-                            blacklist = conf.blacklist
-                        except ConfigException:
-                            # blacklist isn't mandatory
-                            blacklist = []
-                        if mypkg.group(1) not in blacklist or not parse_sysreq:
+                        if not parse_sysreq:
                             self.categories[mypkg.group(1)] = cat
                             self.pkg_list[cat].append({
                                 'name': mypkg.group(1),

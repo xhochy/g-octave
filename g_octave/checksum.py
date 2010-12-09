@@ -24,7 +24,7 @@ import json
 import os
 
 from .config import Config
-config = Config(True)
+config = Config()
 
 
 def sha1_compute(filename):

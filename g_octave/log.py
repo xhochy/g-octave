@@ -18,7 +18,7 @@ import logging
 import sys
 
 from .config import Config
-conf = Config(fetch_phase=True)
+conf = Config()
 
 
 class Log(object):
