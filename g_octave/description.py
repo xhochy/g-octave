@@ -49,7 +49,7 @@ conf = Config()
 # octave-forge DESCRIPTION's dependencies atoms
 re_depends = re.compile(r'^([a-zA-Z0-9-]+) *(\( *([><=]?=?) *([0-9.]+) *\))?')
 
-# we'll use atoms like 'control-1.0.11' to g-octave packages
+# we'll use atoms like 'control-1.0.11' for g-octave packages
 re_pkg_atom = re.compile(r'^(.+)-([0-9.]+)$') 
 
 class Description(object):

@@ -54,6 +54,6 @@ class Log(object):
         self.logger.addHandler(self.handler)
     
     def __getattr__(self, attr):
-        if attr in ['debug', 'info', 'warning', 'error', 'critical']:
+        if attr in self._levels:
             return getattr(self.logger, attr)
         return lambda x: None
