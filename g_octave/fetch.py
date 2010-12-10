@@ -72,7 +72,7 @@ class GitHub:
         )
         commits = {}
         with closing(urllib.urlopen(url)) as fp:
-            commits = json.load(fp)
+            commits = json.loads(fp.read().decode('utf-8'))
         return commits['commits']
     
     def fetch_db(self, branch='master'):

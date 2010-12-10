@@ -285,7 +285,7 @@ def main():
             updates.extract()
             
             log.info('Checking SHA1 checksums ...')
-            out.ebegin('Checking SHA1 checksums ...')
+            out.ebegin('Checking SHA1 checksums')
             if sha1_check_db(DescriptionTree()):
                 out.eend(0)
             else:

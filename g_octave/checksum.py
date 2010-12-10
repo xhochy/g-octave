@@ -29,11 +29,8 @@ config = Config()
 
 
 def sha1_compute(filename):
-    with open(filename) as fp:
-        content = fp.read()
-        if py3k:
-            content = bytes(content, 'utf-8')
-        return sha1(content).hexdigest()
+    with open(filename, 'rb') as fp:
+        return sha1(fp.read()).hexdigest()
 
 def sha1_check(db, p):
     description = db[p]

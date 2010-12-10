@@ -72,8 +72,10 @@ class Description(object):
         # current key
         key = None
 
-        with open(file, 'r') as fp:
+        with open(file, 'rb') as fp:
             for line in fp:
+                
+                line = line.decode('iso-8859-15')
                 line_splited = line.split(':')
 
                 # 'key: value' found?
