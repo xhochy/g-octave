@@ -19,20 +19,21 @@ __all__ = [
     'sha1_check_db',
 ]
 
-from hashlib import sha1
+import hashlib
 import json
 import os
 
 from .config import Config
-from .compat import py3k
 config = Config()
 
 
 def sha1_compute(filename):
+    '''Computes the SHA1 checksum of a file'''
     with open(filename, 'rb') as fp:
-        return sha1(fp.read()).hexdigest()
+        return hashlib.sha1(fp.read()).hexdigest()
 
 def sha1_check(db, p):
+    '''Checks if the SHA1 checksum of the package is OK.'''
     description = db[p]
     manifest = {}
     with open(os.path.join(config.db, 'manifest.json')) as fp:
@@ -42,6 +43,7 @@ def sha1_check(db, p):
     return manifest[p] == description.sha1sum()
 
 def sha1_check_db(db):
+    '''Checks if the SHA1 checksums of the package database are OK.'''
     for cat in db.pkg_list:
         for pkg in db.pkg_list[cat]:
             p = pkg['name']+'-'+pkg['version']
