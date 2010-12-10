@@ -183,6 +183,7 @@ class TestDescription(testcase.TestCase):
         self.assertEqual(self.desc.P, 'pkg-0.0.1')
         self.assertEqual(self.desc.PN, 'pkg')
         self.assertEqual(self.desc.PV, '0.0.1')
+        self.assertEqual(self.desc.CAT, None)
 
         requirements = [
             '<g-octave/pkg12-1.2.3',

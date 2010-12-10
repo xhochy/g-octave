@@ -58,6 +58,9 @@ class Description(object):
     P = None
     PN = None
     PV = None
+    CAT = None
+    
+    _categories = ['main', 'extra', 'language', 'nonfree']
     
     def __init__(self, file, parse_sysreq=True):
         
@@ -75,6 +78,10 @@ class Description(object):
             self.P = my_atom.group(1)
             self.PN = my_atom.group(2)
             self.PV = my_atom.group(3)
+        
+        file_parts = self._file.split(os.sep)
+        if len(file_parts) >= 3 and file_parts[-3] in self._categories:
+            self.CAT = file_parts[-3]
         
         # dictionary with the parsed content of the DESCRIPTION file
         self._desc = dict()
@@ -300,4 +307,8 @@ class SvnDescription(Description):
         except:
             raise DescriptionException('Failed to fetch DESCRIPTION file from SVN')
         Description.__init__(self, temp_desc)
+        self.PN = package
+        self.PV = '9999'
+        self.P = '%s-%s' % (self.PN, self.PV)
+        self.CAT = category
         os.unlink(temp_desc)
