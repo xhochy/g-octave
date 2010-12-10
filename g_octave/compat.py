@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """
-    compat.py
-    ~~~~~~~~~
+    g_octave.compat
+    ~~~~~~~~~~~~~~~
     
     This module implements some helper function to compatibility with
     Python 3k.

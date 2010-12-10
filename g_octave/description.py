@@ -277,7 +277,7 @@ class SvnDescription(Description):
     _url = 'https://octave.svn.sourceforge.net/svnroot/octave/trunk/octave-forge'
     
     def __init__(self, category, package):
-        temp_desc = config_file = tempfile.mkstemp()[1]
+        temp_desc = tempfile.mkstemp()[1]
         desc_url = '%s/%s/%s/DESCRIPTION' % (
             self._url,
             category,
