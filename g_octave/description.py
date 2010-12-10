@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """
-    description.py
-    ~~~~~~~~~~~~~~
+    g_octave.description
+    ~~~~~~~~~~~~~~~~~~~~
 
     This module implements a Python object with the content of a given
     DESCRIPTION file.

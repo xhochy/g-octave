@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """
-    log.py
-    ~~~~~~
+    g_octave.log
+    ~~~~~~~~~~~~
     
     A simple Python module to deal with g-octave logging stuff.
     

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """
-    fetch.py
-    ~~~~~~~~
+    g_octave.fetch
+    ~~~~~~~~~~~~~~
     
     This module implements a Python class responsible to fetch and update
     the package database and the auxiliary files.

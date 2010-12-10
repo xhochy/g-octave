@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """
-    ebuild.py
-    ~~~~~~~~~
+    g_octave.ebuild
+    ~~~~~~~~~~~~~~~
     
     This module implements a Python class responsible to create the ebuilds
     for the octave-forge packages and track the dependencies correctly.

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """
-    package_manager.py
-    ~~~~~~~~~~~~~~~~~~
+    g_octave.package_manager
+    ~~~~~~~~~~~~~~~~~~~~~~~~
 
     This module implements some Python classes for the implementation of
     the multiple package manager support.

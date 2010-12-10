@@ -19,9 +19,11 @@ __all__ = [
 import codecs
 import sys
 
+
 py3k = sys.version_info >= (3, 0)
 
 def open(filename, mode='r', encoding='utf-8'):
+    '''custom implementation of the 'open' builtin, using the codecs module'''
     try:
         return codecs.open(filename, mode=mode, encoding=encoding)
     except:

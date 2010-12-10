@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """
-    description_tree.py
-    ~~~~~~~~~~~~~~~~~~~
+    g_octave.description_tree
+    ~~~~~~~~~~~~~~~~~~~~~~~~~
     
     This module implements a Python object with the content of a directory
     tree with DESCRIPTION files. The object contains *g_octave.Description*

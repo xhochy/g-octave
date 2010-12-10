@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """
-    checksum.py
-    ~~~~~~~~~~~
+    g_octave.checksum
+    ~~~~~~~~~~~~~~~~~
     
     This module implements functions for compute/generate SHA1 checksums
     for DESCRIPTION files.
