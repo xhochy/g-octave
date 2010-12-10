@@ -50,10 +50,15 @@ conf = Config()
 re_depends = re.compile(r'^([a-zA-Z0-9-]+) *(\( *([><=]?=?) *([0-9.]+) *\))?')
 
 # we'll use atoms like 'control-1.0.11' for g-octave packages
-re_pkg_atom = re.compile(r'^(.+)-([0-9.]+)$') 
+re_pkg_atom = re.compile(r'^((.+)-([0-9.]+))\.DESCRIPTION$') 
 
 class Description(object):
-
+    
+    # gentoo ebuild variables
+    P = None
+    PN = None
+    PV = None
+    
     def __init__(self, file, parse_sysreq=True):
         
         log.info('Parsing file: %s' % file)
@@ -63,9 +68,14 @@ class Description(object):
             raise DescriptionException('File not found: %s' % file)
 
         self._file = file
-
         self._info = Info(os.path.join(conf.db, 'info.json'))
-
+        
+        my_atom = re_pkg_atom.match(os.path.basename(self._file))
+        if my_atom is not None:
+            self.P = my_atom.group(1)
+            self.PN = my_atom.group(2)
+            self.PV = my_atom.group(3)
+        
         # dictionary with the parsed content of the DESCRIPTION file
         self._desc = dict()
 
