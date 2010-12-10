@@ -33,6 +33,7 @@ import subprocess
 
 from portage.versions import vercmp
 
+config = Config()
 out = portage.output.EOutput()
 
 # validating keywords (based on the keywords from the sci-mathematics/octave package)
@@ -40,19 +41,12 @@ re_keywords = re.compile(r'(~)?(alpha|amd64|hppa|ppc64|ppc|sparc|x86)')
 
 class Ebuild:
     
-    def __init__(self, pkg_atom, force=False, scm=False, conf=None, pkg_manager=None):
+    def __init__(self, pkg_atom, force=False, scm=False, pkg_manager=None):
         
         self.__scm = scm
         self.__force = force
-        self.__conf = conf
         self.__pkg_manager = pkg_manager
-        
-        if conf is None:
-            conf = Config()
-        
-        self._config = conf
-        
-        self.__dbtree = DescriptionTree(conf = self._config)
+        self.__dbtree = DescriptionTree()
         
         atom = re_pkg_atom.match(pkg_atom)
         if atom == None:
@@ -84,7 +78,7 @@ class Ebuild:
     def create(self, display_info=True, accept_keywords=None, manifest=True, nodeps=False):
         
         my_ebuild = os.path.join(
-            self._config.overlay,
+            config.overlay,
             'g-octave',
             '%s' % self.pkgname,
             '%s-%s.ebuild' % (self.pkgname, self.version)
@@ -115,7 +109,7 @@ class Ebuild:
 
     def __create(self, accept_keywords=None, manifest=True):
         
-        ebuild_path = os.path.join(self._config.overlay, 'g-octave', self.pkgname)
+        ebuild_path = os.path.join(config.overlay, 'g-octave', self.pkgname)
         ebuild_file = os.path.join(ebuild_path, '%s-%s.ebuild' % (self.pkgname, self.version))
         metadata_file = os.path.join(ebuild_path, 'metadata.xml')
         
@@ -193,8 +187,8 @@ RDEPEND="${DEPEND}
             
             # WOW, we have patches :(
             
-            patchesdir = os.path.join(self._config.db, 'patches')
-            filesdir = os.path.join(self._config.overlay, 'g-octave', self.pkgname, 'files')
+            patchesdir = os.path.join(config.db, 'patches')
+            filesdir = os.path.join(config.overlay, 'g-octave', self.pkgname, 'files')
             if not os.path.exists(filesdir):
                 os.makedirs(filesdir, 0o755)
             
@@ -270,7 +264,7 @@ RDEPEND="${DEPEND}
 
     def __search_patches(self):
         
-        patches_dir = os.path.join(self._config.db, 'patches')
+        patches_dir = os.path.join(config.db, 'patches')
         
         if not os.path.exists(patches_dir):
             return []
@@ -317,7 +311,6 @@ RDEPEND="${DEPEND}
             Ebuild(
                 ebuild,
                 force = self.__force,
-                conf = self.__conf,
                 pkg_manager = self.__pkg_manager,
                 scm = self.__scm
             ).create()

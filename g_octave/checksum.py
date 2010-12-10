@@ -24,12 +24,16 @@ import json
 import os
 
 from .config import Config
+from .compat import py3k
 config = Config()
 
 
 def sha1_compute(filename):
     with open(filename) as fp:
-        return sha1(fp.read()).hexdigest()
+        content = fp.read()
+        if py3k:
+            content = bytes(content, 'utf-8')
+        return sha1(content).hexdigest()
 
 def sha1_check(db, p):
     description = db[p]

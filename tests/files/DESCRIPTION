@@ -15,8 +15,8 @@ Description: Lorem ipsum dolor sit amet, consectetur adipisicing elit,
  mollit anim id est laborum.
 Categories: Category1,Category2, Category3
 Url: http://example.org
-SystemRequirements: pkg1 ( >= 4.3.2), pkg2 (<1.2.3 ), pkg3
-BuildRequires: pkg4 (>1.0.0)
+SystemRequirements: pkg11 ( >= 4.3.2), pkg12 (<1.2.3 ), pkg13
+BuildRequires: pkg14 (>1.0.0)
 Depends: Octave ( >= 3.0.0 )
 Autoload: NO
 License: GPL version 3 or later

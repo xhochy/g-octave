@@ -14,16 +14,16 @@
 import os
 import shutil
 import unittest
-import utils
+import testcase
 
 from g_octave import description, description_tree
 
 
-class TestDescriptionTree(unittest.TestCase):
+class TestDescriptionTree(testcase.TestCase):
     
     def setUp(self):
-        conf, self._config_file, self._tempdir = utils.create_env()
-        self._tree = description_tree.DescriptionTree(conf = conf)
+        testcase.TestCase.setUp(self)
+        self._tree = description_tree.DescriptionTree()
     
     def test_package_versions(self):
         versions = {
@@ -93,11 +93,7 @@ class TestDescriptionTree(unittest.TestCase):
                     self._tree[pkg+'-'+ver],
                     description.Description
                 )
-            ) 
-    
-    def tearDown(self):
-        # removing the temp tree
-        utils.clean_env(self._config_file, self._tempdir)
+            )
 
 
 def suite():

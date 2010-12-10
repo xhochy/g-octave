@@ -4,7 +4,7 @@
     log.py
     ~~~~~~
     
-    a simple Python module to deal with g-octave logging stuff.
+    A simple Python module to deal with g-octave logging stuff.
     
     :copyright: (c) 2010 by Rafael Goncalves Martins
     :license: GPL-2, see LICENSE for more details.

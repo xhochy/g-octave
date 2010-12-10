@@ -27,6 +27,8 @@ from .exception import DescriptionTreeException
 from .log import Log
 log = Log('g_octave.description_tree')
 
+config = Config()
+
 # from http://wiki.python.org/moin/HowTo/Sorting/
 def cmp_to_key(mycmp):
     'Convert a cmp= function into a key= function'
@@ -49,25 +51,20 @@ def cmp_to_key(mycmp):
 
 class DescriptionTree(object):
     
-    def __init__(self, conf=None, parse_sysreq=True):
+    def __init__(self, parse_sysreq=True):
         
         log.info('Parsing the package database.')
         
         self._parse_sysreq = parse_sysreq
         self.pkg_list = {}
-        
-        if conf is None:
-            conf = Config()
-        self._config = conf
-        
-        self._db_path = os.path.join(conf.db, 'octave-forge')
+        self._db_path = os.path.join(config.db, 'octave-forge')
         
         if not os.path.isdir(self._db_path):
             log.error('Invalid db: %s' % self._db_path)
             raise DescriptionTreeException('Invalid db: %s' % self._db_path)
         
         self.categories = {}
-        for cat in [i.strip() for i in conf.categories.split(',')]:
+        for cat in [i.strip() for i in config.categories.split(',')]:
             catdir = os.path.join(self._db_path, cat)
             if os.path.isdir(catdir):
                 self.pkg_list[cat] = []
@@ -78,14 +75,13 @@ class DescriptionTree(object):
                         pkg_p = desc_file[:-len('.DESCRIPTION')]
                         mypkg = re_pkg_atom.match(pkg_p)
                         if mypkg is None:
-                            log.error('Invalid Atom: %s' % mypkg)
-                            raise DescriptionTreeException('Invalid Atom: %s' % mypkg)
-                        if not parse_sysreq:
-                            self.categories[mypkg.group(1)] = cat
-                            self.pkg_list[cat].append({
-                                'name': mypkg.group(1),
-                                'version': mypkg.group(2),
-                            })
+                            log.error('Invalid Atom: %s' % pkg_p)
+                            raise DescriptionTreeException('Invalid Atom: %s' % pkg_p)
+                        self.categories[mypkg.group(1)] = cat
+                        self.pkg_list[cat].append({
+                            'name': mypkg.group(1),
+                            'version': mypkg.group(2),
+                        })
     
     
     def __getitem__(self, key):
@@ -106,11 +102,7 @@ class DescriptionTree(object):
                         pkg['name'],
                         '%s-%s.DESCRIPTION' % (pkg['name'], pkg['version']),
                     )
-                    return Description(
-                        pkgfile,
-                        conf = self._config,
-                        parse_sysreq = self._parse_sysreq
-                    )
+                    return Description(pkgfile, parse_sysreq=self._parse_sysreq)
         
         return None
     

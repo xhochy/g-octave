@@ -13,16 +13,16 @@
 
 import os
 import unittest
-import utils
+import testcase
 
 from g_octave import ebuild, overlay
 
 
-class TestEbuild(unittest.TestCase):
+class TestEbuild(testcase.TestCase):
     
     def setUp(self):
-        self._config, self._config_file, self._dir = utils.create_env(json_files=True)
-        overlay.create_overlay(conf = self._config, quiet = True)
+        testcase.TestCase.setUp(self)
+        overlay.create_overlay(quiet=True)
     
     def test_re_keywords(self):
         keywords = [
@@ -59,10 +59,7 @@ class TestEbuild(unittest.TestCase):
             ('language2', '0.0.1'),
         ]
         for pkgname, pkgver in ebuilds:
-            _ebuild = ebuild.Ebuild(
-                pkgname + '-' + pkgver,
-                conf = self._config,
-            )
+            _ebuild = ebuild.Ebuild(pkgname + '-' + pkgver)
             _ebuild.create(
                 accept_keywords = 'amd64 ~amd64 x86 ~x86',
                 manifest = False,
@@ -87,10 +84,7 @@ class TestEbuild(unittest.TestCase):
             self.assertEqual(len(created_ebuild), len(original_ebuild))
             for i in range(len(created_ebuild)):
                 self.assertEqual(created_ebuild[i], original_ebuild[i])            
-    
-    def tearDown(self):
-        utils.clean_env(self._config_file, self._dir)
-    
+
 
 def suite():
     suite = unittest.TestSuite()

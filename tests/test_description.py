@@ -13,20 +13,19 @@
 
 import os
 import unittest
-import utils
+import testcase
 
 from g_octave import description
 
 
-class TestDescription(unittest.TestCase):
+class TestDescription(testcase.TestCase):
 
     def setUp(self):
-        conf, self._config_file, self._tempdir = utils.create_env()
+        testcase.TestCase.setUp(self)
         self.desc = description.Description(
             os.path.join(
                 os.path.dirname(os.path.abspath(__file__)), 'files', 'DESCRIPTION',
             ),
-            conf = conf
         )
 
     def test_re_depends(self):
@@ -187,22 +186,17 @@ class TestDescription(unittest.TestCase):
         self.assertEqual(self.desc.url, 'http://example.org')
 
         requirements = [
-            '>=g-octave/pkg1-4.3.2',
-            '<g-octave/pkg2-1.2.3',
-            'g-octave/pkg3'
+            '<g-octave/pkg12-1.2.3',
+            'g-octave/pkg13',
+            '>=g-octave/pkg11-4.3.2',
         ]
-        requirements.sort()
         self.assertEqual(self.desc.systemrequirements, requirements)
-        self.assertEqual(self.desc.buildrequires, ['>g-octave/pkg4-1.0.0'])
+        self.assertEqual(self.desc.buildrequires, ['>g-octave/pkg14-1.0.0'])
 
         self.assertEqual(self.desc.depends, ['>=sci-mathematics/octave-3.0.0'])
         self.assertEqual(self.desc.autoload, 'NO')
         self.assertEqual(self.desc.license, 'GPL version 3 or later')
-        self.assertEqual(self.desc.sha1sum(), '6538f6e7cd4515ef38e04a9b62da4bebb7496b51')
-
-    def tearDown(self):
-        # removing the temp tree
-        utils.clean_env(self._config_file, self._tempdir)
+        self.assertEqual(self.desc.sha1sum(), '6d1559b50a09189e5d25b402a004d12cafc8ee4f')
 
 
 def suite():

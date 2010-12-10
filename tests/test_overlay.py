@@ -13,18 +13,15 @@
 
 import os
 import unittest
-import utils
+import testcase
 
 from g_octave import config, overlay
 
 
-class TestOverlay(unittest.TestCase):
-    
-    def setUp(self):
-        self._config, self._config_file, self._dir = utils.create_env()
+class TestOverlay(testcase.TestCase):
 
     def test_overlay(self):
-        overlay.create_overlay(conf = self._config, quiet = True)
+        overlay.create_overlay(quiet=True)
         files = {
             os.path.join(self._config.overlay, 'profiles', 'repo_name'): 'g-octave',
             os.path.join(self._config.overlay, 'profiles', 'categories'): 'g-octave',
@@ -36,9 +33,6 @@ class TestOverlay(unittest.TestCase):
         self.assertTrue(os.path.islink(
             os.path.join(self._config.overlay, 'eclass', 'g-octave.eclass')
         ))
-
-    def tearDown(self):
-        utils.clean_env(self._config_file, self._dir)
 
 
 def suite():

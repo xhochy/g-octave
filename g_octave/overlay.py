@@ -23,33 +23,30 @@ import portage.output
 from .config import Config, ConfigException
 from .compat import open
 
+config = Config()
 out = portage.output.EOutput()
 
-def create_overlay(force=False, conf=None, quiet=False):
+def create_overlay(force=False, quiet=False):
     
-    # the function parameter conf is used by the tests
-    if conf is None:
-        conf = Config()
+    if force and os.path.exists(config.overlay):
+        shutil.rmtree(config.overlay)
     
-    if force and os.path.exists(conf.overlay):
-        shutil.rmtree(conf.overlay)
-    
-    if not os.path.exists(os.path.join(conf.overlay, 'profiles', 'repo_name')):
+    if not os.path.exists(os.path.join(config.overlay, 'profiles', 'repo_name')):
         
         if not quiet:
-            out.ebegin('Creating overlay: %s' % conf.overlay)
+            out.ebegin('Creating overlay: %s' % config.overlay)
         
         try:
             # creating dirs
             for _dir in ['profiles', 'eclass']:
-                dir = os.path.join(conf.overlay, _dir)
+                dir = os.path.join(config.overlay, _dir)
                 if not os.path.exists(dir) or force:
                     os.makedirs(dir, 0o755)
             
             # creating files
             files = {
-                os.path.join(conf.overlay, 'profiles', 'repo_name'): 'g-octave',
-                os.path.join(conf.overlay, 'profiles', 'categories'): 'g-octave',
+                os.path.join(config.overlay, 'profiles', 'repo_name'): 'g-octave',
+                os.path.join(config.overlay, 'profiles', 'categories'): 'g-octave',
             }
             
             # symlinking g-octave eclass
@@ -58,7 +55,7 @@ def create_overlay(force=False, conf=None, quiet=False):
                 '..', 'share', 'g-octave.eclass'
             )
             global_eclass = os.path.join(sys.prefix, 'share', 'g-octave', 'g-octave.eclass')
-            overlay_eclass = os.path.join(conf.overlay, 'eclass', 'g-octave.eclass')
+            overlay_eclass = os.path.join(config.overlay, 'eclass', 'g-octave.eclass')
             if os.path.exists(local_eclass):
                 os.symlink(local_eclass, overlay_eclass)
             elif os.path.exists(global_eclass):
