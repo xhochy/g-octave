@@ -20,7 +20,8 @@ __all__ = [
     'Description',
     'SvnDescription',
     're_depends',
-    're_pkg_atom'
+    're_pkg_atom',
+    're_desc_file',
 ]
 
 import os
@@ -50,7 +51,11 @@ conf = Config()
 re_depends = re.compile(r'^([a-zA-Z0-9-]+) *(\( *([><=]?=?) *([0-9.]+) *\))?')
 
 # we'll use atoms like 'control-1.0.11' for g-octave packages
-re_pkg_atom = re.compile(r'^((.+)-([0-9.]+))\.DESCRIPTION$') 
+re_pkg_atom = re.compile(r'^(.+)-([0-9.]+)$') 
+
+# pattern for DESCRIPTION filenames
+re_desc_file = re.compile(r'^((.+)-([0-9.]+))\.DESCRIPTION$') 
+
 
 class Description(object):
     
@@ -73,7 +78,7 @@ class Description(object):
         self._file = file
         self._info = Info(os.path.join(conf.db, 'info.json'))
         
-        my_atom = re_pkg_atom.match(os.path.basename(self._file))
+        my_atom = re_desc_file.match(os.path.basename(self._file))
         if my_atom is not None:
             self.P = my_atom.group(1)
             self.PN = my_atom.group(2)

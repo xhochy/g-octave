@@ -56,15 +56,13 @@ class Ebuild:
             self.pkgname = atom.group(1)
             self.version = atom.group(2)
         
+        self.__desc = self.__dbtree.get('%s-%s' % (self.pkgname, self.version))
         if self.__scm:
             self.version = '9999'
-            category = self.__dbtree.categories.get(self.pkgname, None)
-            if category is not None:
-                self.__desc = SvnDescription(category, self.pkgname)
+            if self.__desc is not None:
+                self.__desc = SvnDescription(self.__desc.CAT, self.pkgname)
             else:
                 raise EbuildException('Failed to find the octave-forge category of this package.')
-        else:
-            self.__desc = self.__dbtree['%s-%s' % (self.pkgname, self.version)]
         
         if self.__desc == None:
             raise EbuildException('Package not found: %s' % pkg_atom)
@@ -160,7 +158,7 @@ RDEPEND="${DEPEND}
         if accept_keywords is None:
             accept_keywords = portage.settings['ACCEPT_KEYWORDS']
         
-        category = self.__dbtree.categories.get(self.pkgname, '')
+        category = self.__desc.CAT
         
         vars = {
             'eutils': '',

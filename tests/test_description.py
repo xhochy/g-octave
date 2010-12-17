@@ -157,17 +157,27 @@ class TestDescription(testcase.TestCase):
                 (match.group(1), match.group(3), match.group(4)),
                 pkgtpl
             )
-
+    
     def test_re_pkg_atom(self):
+        depends = [
+            ('pkg-1', ('pkg', '1')),
+            ('pkg-1.0', ('pkg', '1.0')),
+            ('pkg-1.0.0', ('pkg', '1.0.0')),
+        ]
+        for pkgstr, pkgtpl in depends:
+            match = description.re_pkg_atom.match(pkgstr)
+            self.assertEqual((match.group(1), match.group(2)), pkgtpl)
+    
+    def test_re_desc_file(self):
         depends = [
             ('pkg-1.DESCRIPTION', ('pkg-1', 'pkg', '1')),
             ('pkg-1.0.DESCRIPTION', ('pkg-1.0', 'pkg', '1.0')),
             ('pkg-1.0.0.DESCRIPTION', ('pkg-1.0.0', 'pkg', '1.0.0')),
         ]
         for pkgstr, pkgtpl in depends:
-            match = description.re_pkg_atom.match(pkgstr)
+            match = description.re_desc_file.match(pkgstr)
             self.assertEqual((match.group(1), match.group(2), match.group(3)), pkgtpl)
-
+    
     def test_attributes(self):
         # TODO: split this method to improve the error reporting
         # TODO: figure out how to test the comments
@@ -203,6 +213,7 @@ def suite():
     suite = unittest.TestSuite()
     suite.addTest(TestDescription('test_re_depends'))
     suite.addTest(TestDescription('test_re_pkg_atom'))
+    suite.addTest(TestDescription('test_re_desc_file'))
     suite.addTest(TestDescription('test_attributes'))
     return suite
 

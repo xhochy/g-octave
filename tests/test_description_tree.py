@@ -54,42 +54,42 @@ class TestDescriptionTree(testcase.TestCase):
                 self._tree.latest_version(pkg)
             )
     
-    def test_version_compare(self):
+    def test_latest_version_from_list(self):
         # TODO: cover a better range of versions
         versions = [
-            # ((version1, version2), latest_version)
-            (('1', '2'), '2'),
-            (('0.1', '1'), '1'),
-            (('0.1', '0.2'), '0.2'),
-            (('0.0.1', '1'), '1'),
-            (('0.0.1', '0.1'), '0.1'),
-            (('0.0.1', '0.0.2'), '0.0.2'),
-            (('2', '1'), '2'),
-            (('1', '0.1'), '1'),
-            (('0.2', '0.1'), '0.2'),
-            (('1', '0.0.1'), '1'),
-            (('0.1', '0.0.1'), '0.1'),
-            (('0.0.2', '0.0.1'), '0.0.2'),
+            # ([version1, version2], latest_version)
+            (['1', '2'], '2'),
+            (['0.1', '1'], '1'),
+            (['0.1', '0.2'], '0.2'),
+            (['0.0.1', '1'], '1'),
+            (['0.0.1', '0.1'], '0.1'),
+            (['0.0.1', '0.0.2'], '0.0.2'),
+            (['2', '1'], '2'),
+            (['1', '0.1'], '1'),
+            (['0.2', '0.1'], '0.2'),
+            (['1', '0.0.1'], '1'),
+            (['0.1', '0.0.1'], '0.1'),
+            (['0.0.2', '0.0.1'], '0.0.2'),
         ]
         for ver, latest in versions:
-            self.assertEqual(self._tree.version_compare(ver), latest)
+            self.assertEqual(self._tree.latest_version_from_list(ver), latest)
     
     def test_description_files(self):
         packages = [
-            ('main', 'main1', '0.0.1'),
-            ('main', 'main2', '0.0.1'),
-            ('main', 'main2', '0.0.2'),
-            ('extra', 'extra1', '0.0.1'),
-            ('extra', 'extra2', '0.0.1'),
-            ('extra', 'extra2', '0.0.2'),
-            ('language', 'language1', '0.0.1'),
-            ('language', 'language2', '0.0.1'),
-            ('language', 'language2', '0.0.2'),
+            'main1-0.0.1',
+            'main2-0.0.1',
+            'main2-0.0.2',
+            'extra1-0.0.1',
+            'extra2-0.0.1',
+            'extra2-0.0.2',
+            'language1-0.0.1',
+            'language2-0.0.1',
+            'language2-0.0.2',
         ]
-        for cat, pkg, ver in packages:
+        for pkg in packages:
             self.assertTrue(
                 isinstance(
-                    self._tree[pkg+'-'+ver],
+                    self._tree.get(pkg),
                     description.Description
                 )
             )
@@ -99,6 +99,6 @@ def suite():
     suite = unittest.TestSuite()
     suite.addTest(TestDescriptionTree('test_package_versions'))
     suite.addTest(TestDescriptionTree('test_latest_version'))
-    suite.addTest(TestDescriptionTree('test_version_compare'))
+    suite.addTest(TestDescriptionTree('test_latest_version_from_list'))
     suite.addTest(TestDescriptionTree('test_description_files'))
     return suite

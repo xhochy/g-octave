@@ -34,7 +34,7 @@ def sha1_compute(filename):
 
 def sha1_check(db, p):
     '''Checks if the SHA1 checksum of the package is OK.'''
-    description = db[p]
+    description = db.get(p)
     manifest = {}
     with open(os.path.join(config.db, 'manifest.json')) as fp:
         manifest = json.load(fp)
@@ -44,9 +44,7 @@ def sha1_check(db, p):
 
 def sha1_check_db(db):
     '''Checks if the SHA1 checksums of the package database are OK.'''
-    for cat in db.pkg_list:
-        for pkg in db.pkg_list[cat]:
-            p = pkg['name']+'-'+pkg['version']
-            if not sha1_check(db, p):
-                return False
+    for pkg in db:
+        if not sha1_check(db, pkg.P):
+            return False
     return True
