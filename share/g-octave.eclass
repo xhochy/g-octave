@@ -3,7 +3,7 @@
 # $Header: $
 
 #
-# Original Author: Rafael G. Martins <rafael@rafaelmartins.eng.br>
+# Original Author: Rafael G. Martins <rafaelmartins@gentoo.org>
 # Purpose: g-octave helper eclass.
 #
 
@@ -15,10 +15,10 @@ G_OCTAVE_CAT="${G_OCTAVE_CAT:-main}"
 
 REPO_URI="https://octave.svn.sourceforge.net/svnroot/octave/trunk/octave-forge"
 if [[ ${PV} = 9999* ]]; then
-	inherit subversion autotools
+	inherit subversion autotools base
 	ESVN_REPO_URI="${REPO_URI}/${G_OCTAVE_CAT}/${PN}"
 else
-	inherit autotools
+	inherit autotools base
 	SRC_URI="mirror://sourceforge/octave/${P}.tar.gz"
 fi
 
@@ -55,6 +55,7 @@ g-octave_src_prepare() {
 	if [ -e ${S}/src/Makefile ]; then
 		sed -i 's/ -s / /g' ${S}/src/Makefile || die 'sed failed.'
 	fi
+	base_src_prepare
 }
 
 g-octave_src_install() {
