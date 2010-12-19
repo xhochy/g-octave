@@ -34,7 +34,7 @@ from contextlib import closing
 from .config import Config
 from .compat import py3k
 from .checksum import sha1_compute
-from .exception import DescriptionException
+from .exception import GOctaveError
 from .info import Info
 
 if py3k:
@@ -73,7 +73,7 @@ class Description(object):
 
         if not os.path.exists(file):
             log.error('File not found: %s' % file)
-            raise DescriptionException('File not found: %s' % file)
+            raise GOctaveError('File not found: %s' % file)
 
         self._file = file
         self._info = Info(os.path.join(conf.db, 'info.json'))
@@ -243,7 +243,7 @@ class Description(object):
             # invalid dependency atom
             else:
                 log.error('Invalid dependency atom: %s' % depend)
-                raise DescriptionException('Invalid dependency atom: %s' % depend)
+                raise GOctaveError('Invalid dependency atom: %s' % depend)
 
         return list(set(depends_list))
 
@@ -277,7 +277,7 @@ class Description(object):
             # invalid dependency atom
             else:
                 log.error('Invalid dependency atom: %s' % depend)
-                raise DescriptionException('Invalid dependency atom: %s' % depend)
+                raise GOctaveError('Invalid dependency atom: %s' % depend)
 
         return depends_list
 
@@ -290,7 +290,8 @@ class Description(object):
         """method that overloads the object atributes, returning the needed
         atribute based on the dict with the previously parsed content.
         """
-
+        if name in ['depends', 'buildrequires', 'systemrequirements']:
+            return self._desc.get(name, [])
         return self._desc.get(name, None)
 
 
@@ -310,7 +311,7 @@ class SvnDescription(Description):
                 with open(temp_desc, 'wb') as fp_:
                     shutil.copyfileobj(fp, fp_)
         except:
-            raise DescriptionException('Failed to fetch DESCRIPTION file from SVN')
+            raise GOctaveError('Failed to fetch DESCRIPTION file from SVN')
         Description.__init__(self, temp_desc)
         self.PN = package
         self.PV = '9999'

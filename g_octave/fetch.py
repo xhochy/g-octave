@@ -21,7 +21,7 @@ from .config import Config
 conf = Config()
 
 from .description_tree import DescriptionTree
-from .exception import FetchException
+from .exception import GOctaveError
 from .compat import py3k, open as open_
 
 if py3k:
@@ -71,9 +71,12 @@ class GitHub:
             branch
         )
         commits = {}
-        with closing(urllib.urlopen(url)) as fp:
-            commits = json.loads(fp.read().decode('utf-8'))
-        return commits['commits']
+        try:
+            with closing(urllib.urlopen(url)) as fp:
+                commits = json.loads(fp.read().decode('utf-8'))
+            return commits['commits']
+        except:
+            raise GOctaveError('Failed to fetch the package database. Please check your internet connection.')
     
     def fetch_db(self, branch='master'):
         cache = os.path.join(conf.db, 'cache')
@@ -119,7 +122,7 @@ class GitHub:
                     fp.extractall(conf.db)
                 dirs = glob.glob('%s/%s-%s*' % (conf.db, self.user, self.repo))
                 if len(dirs) != 1:
-                    raise FetchException('Failed to extract the tarball.')
+                    raise GOctaveError('Failed to extract the tarball.')
                     return
                 for f in os.listdir(dirs[0]):
                     shutil.move(os.path.join(dirs[0], f), conf.db)

@@ -14,14 +14,12 @@
 from __future__ import absolute_import
 import json
 
+from .exception import GOctaveError
+
 # py3k compatibility
 from .compat import open
 
-__all__ = ['Info', 'InfoException']
-
-
-class InfoException(Exception):
-    pass
+__all__ = ['Info']
 
 
 class Info(object):
@@ -40,7 +38,7 @@ class Info(object):
             with open(filename) as fp:
                 from_json = json.load(fp)
         except:
-            raise InfoException('Failed to load JSON file: %r' % filename)
+            raise GOctaveError('Failed to load JSON file: %r' % filename)
         else:
             if 'dependencies' in from_json:
                 self.dependencies = from_json['dependencies']

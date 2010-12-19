@@ -20,7 +20,7 @@ import sys
 import shutil
 import portage.output
 
-from .config import Config, ConfigException
+from .config import Config
 from .compat import open
 
 config = Config()
@@ -71,7 +71,7 @@ def create_overlay(force=False, quiet=False):
                         if hasattr(content, 'name'):
                             content = content.read()
                         fp.write(content)
-        except Exception as error:
+        except:
             if not quiet:
                 out.eend(1)
             sys.exit(1)

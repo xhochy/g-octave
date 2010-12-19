@@ -14,6 +14,8 @@
 from __future__ import absolute_import
 import os
 
+from .exception import GOctaveError
+
 # py3k compatibility
 from .compat import py3k
 if py3k:
@@ -21,11 +23,7 @@ if py3k:
 else:
     import ConfigParser as configparser
 
-__all__ = ['Config', 'ConfigException']
-
-
-class ConfigException(Exception):
-    pass
+__all__ = ['Config']
 
 
 class Config(object):
@@ -74,7 +72,7 @@ class Config(object):
         
         # no file to parsed
         if len(parsed_files) == 0:
-            raise ConfigException('File not found: %r' % config_file)
+            raise GOctaveError('File not found: %r' % config_file)
 
     def _evaluate_from_file(self, attr):
         # return the value from the configuration file
@@ -97,4 +95,4 @@ class Config(object):
             # default to the configuration file
             return self._evaluate_from_file(attr)
         else:
-            raise ConfigException('Invalid option: %r' % attr)
+            raise GOctaveError('Invalid option: %r' % attr)

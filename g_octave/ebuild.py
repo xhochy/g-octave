@@ -21,7 +21,7 @@ __all__ = [
 from .config import Config
 from .description import *
 from .description_tree import DescriptionTree
-from .exception import EbuildException
+from .exception import GOctaveError
 from .compat import open
 
 import getpass
@@ -96,15 +96,15 @@ class Ebuild:
             pkg_name = atom.group(1)
             version = atom.group(2)
         
-        self.description = self._tree.get(pkg_name + '-' + version)
+        self.description = self._tree.get('%s-%s' % (pkg_name, version))
         if self._scm:
             if self.description is not None:
                 self.description = SvnDescription(self.description.CAT, self.description.PN)
             else:
-                raise EbuildException('Failed to find the octave-forge category of this package.')
+                raise GOctaveError('Failed to find the octave-forge category of this package.')
         
         if self.description is None:
-            raise EbuildException('Package not found: %s' % pkg_atom)
+            raise GOctaveError('Package not found: %s' % pkg_atom)
 
     def create(self, display_info=True, accept_keywords=None, manifest=True, nodeps=False):
         ebuild_dir = os.path.join(config.overlay, 'g-octave', self.description.PN)
@@ -127,11 +127,11 @@ class Ebuild:
                         fp.write(METADATA_TEMPLATE % self._evaluate_metadata_vars())
                 if manifest:
                     if self._pkg_manager.create_manifest(ebuild_file) != os.EX_OK:
-                        raise EbuildException('Failed to create Manifest file!')
+                        raise GOctaveError('Failed to create Manifest file!')
             except Exception as error:
                 if display_info:
                     out.eerror('Failed to create: g-octave/' + self.description.P + '.ebuild')
-                raise EbuildException(error)
+                raise GOctaveError(error)
             else:
                 if not nodeps:
                     self._resolve_dependencies()
@@ -180,7 +180,7 @@ class Ebuild:
         for keyword in keywords:
             match = re_keywords.match(keyword)
             if match == None:
-                raise EbuildException('Invalid keyword: %s' % keyword)
+                raise GOctaveError('Invalid keyword: %s' % keyword)
             if match.group(1) == None:
                 stable.append(match.group(2))
             else:
@@ -239,7 +239,7 @@ class Ebuild:
             to_install.append('%s-%s' % (pkg, self._tree.version_compare(allowed_versions)))
             
             if len(allowed_versions) == 0:
-                raise EbuildException('Can\'t resolve a dependency: %s' % pkg)
+                raise GOctaveError('Can\'t resolve a dependency: %s' % pkg)
         
         # creating the ebuilds for the dependencies, recursivelly
         for ebuild in to_install:

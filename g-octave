@@ -1,0 +1,19 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+    g_octave
+    ~~~~~~~~
+    
+    g-octave's main script.
+    
+    :copyright: (c) 2010 by Rafael Goncalves Martins
+    :license: GPL-2, see LICENSE for more details.
+"""
+
+from g_octave.cli import Cli
+import sys
+
+if __name__ == '__main__':
+    cli = Cli()
+    sys.exit(cli.run())

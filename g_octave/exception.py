@@ -11,22 +11,8 @@
     :license: GPL-2, see LICENSE for more details.
 """
 
-__all__ = [
-    'DescriptionException',
-    'DescriptionTreeException',
-    'EbuildException',
-    'FetchException',
-]
+__all__ = ['GOctaveError']
 
 
-class DescriptionException(Exception):
-    pass
-
-class DescriptionTreeException(Exception):
-    pass
-
-class EbuildException(Exception):
-    pass
-
-class FetchException(Exception):
+class GOctaveError(Exception):
     pass

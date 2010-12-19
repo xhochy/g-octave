@@ -15,6 +15,7 @@ __all__ = [
     'Portage',
     'Pkgcore',
     'Paludis',
+    'get_by_name',
 ]
 
 import grp
@@ -72,7 +73,6 @@ class Portage(Base):
     ]
     
     def __init__(self, ask=False, verbose=False, pretend=False, oneshot=False, nocolor=False):
-        self.overlay_bootstrap()
         self._fullcommand = [self._client]
         ask and self._fullcommand.append('--ask')
         verbose and self._fullcommand.append('--verbose')
@@ -87,15 +87,15 @@ class Portage(Base):
         return self.run_command([pkgatom])
 
     def uninstall_package(self, pkgatom, catpkg):
-        return self.run_command(['--unmerge', pkgatom])
+        return self.run_command(['--unmerge', catpkg])
     
     def update_package(self, pkgatom=None, catpkg=None):
-        if pkgatom is None:
-            pkgatom = self.installed_packages()
+        if catpkg is None:
+            catpkg = self.installed_packages()
         else:
-            pkgatom = [pkgatom]
-        self.do_ebuilds(pkgatom)
-        return self.run_command(['--update'] + pkgatom)
+            catpkg = [catpkg]
+        self.do_ebuilds(catpkg)
+        return self.run_command(['--update'] + catpkg)
     
     def installed_packages(self):
         packages = []
@@ -112,16 +112,10 @@ class Portage(Base):
         import portage
         if overlay not in portage.settings['PORTDIR_OVERLAY'].split(' '):
             out.eerror('g-octave overlay is not configured!')
-            out.eerror('You must append your overlay dir to PORTDIR_OVERLAY.')
+            out.eerror('You must append your overlay directory to PORTDIR_OVERLAY.')
             out.eerror('Overlay: %s' % overlay)
             return False
         return True
-    
-    def overlay_bootstrap(self):
-        overlay = conf.overlay
-        portdir_overlay = os.environ.get('PORTDIR_OVERLAY', '')
-        if overlay not in portdir_overlay:
-            os.environ['PORTDIR_OVERLAY'] = (portdir_overlay + ' ' + overlay).strip()
 
 
 class Pkgcore(Base):
@@ -149,15 +143,15 @@ class Pkgcore(Base):
         return self.run_command([pkgatom])
 
     def uninstall_package(self, pkgatom, catpkg):
-        return self.run_command(['--unmerge', pkgatom])
+        return self.run_command(['--unmerge', catpkg])
     
     def update_package(self, pkgatom=None, catpkg=None):
-        if pkgatom is None:
-            pkgatom = self.installed_packages()
+        if catpkg is None:
+            catpkg = self.installed_packages()
         else:
-            pkgatom = [pkgatom]
-        self.do_ebuilds(pkgatom)
-        return self.run_command(['--upgrade', '--noreplace'] + pkgatom)
+            catpkg = [catpkg]
+        self.do_ebuilds(catpkg)
+        return self.run_command(['--upgrade', '--noreplace'] + catpkg)
     
     def installed_packages(self):
         packages = []
@@ -216,19 +210,19 @@ class Paludis(Base):
         return self.run_command(cmd)
 
     def uninstall_package(self, pkgatom, catpkg):
-        return self.run_command(['--uninstall', pkgatom])
+        return self.run_command(['--uninstall', catpkg])
     
     def update_package(self, pkgatom=None, catpkg=None):
-        if pkgatom is None:
-            pkgatom = self.installed_packages()
+        if catpkg is None:
+            catpkg = self.installed_packages()
         else:
-            pkgatom = [pkgatom]
-        self.do_ebuilds(pkgatom)
+            catpkg = [catpkg]
+        self.do_ebuilds(catpkg)
         return self.run_command([
             '--install',
             '--dl-upgrade', 'as-needed',
             '--dl-reinstall-targets', 'never',
-        ] + pkgatom)
+        ] + catpkg)
     
     def installed_packages(self):
         packages = []
@@ -243,3 +237,13 @@ class Paludis(Base):
                 packages.append(line.strip())
         return packages
 
+
+def get_by_name(name):
+    if name.lower() == 'portage':
+        return Portage
+    elif name.lower() == 'paludis':
+        return Paludis
+    elif name.lower() == 'pkgcore':
+        return Pkgcore
+    else:
+        return None
