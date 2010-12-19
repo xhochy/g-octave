@@ -218,7 +218,7 @@ class Cli:
             )
         
         # checking if the overlay is properly configured
-        self.pkg_manager.check_overlay(config.overlay, out):
+        if not self.pkg_manager.check_overlay(config.overlay, out):
             raise GOctaveError('Overlay not properly configured.')
     
     def _init_ebuild(self):
@@ -386,13 +386,13 @@ class Cli:
         try:
             return self._run()
         except GOctaveError as err:
-            log.error(unicode(err))
-            out.eerror(unicode(err))
+            log.error(str(err))
+            out.eerror(str(err))
             return os.EX_USAGE
         except Exception as err:
             tb = traceback.format_exc()
             log.error(tb)
-            out.eerror('Unknown error - ' + unicode(err))
+            out.eerror('Unknown error - ' + str(err))
             fd, filename = tempfile.mkstemp(prefix='g-octave-', suffix='.log')
             error_log = 'Command: ' + ' '.join(sys.argv) + '\n\n' + tb
             if os.write(fd, error_log) != len(error_log):

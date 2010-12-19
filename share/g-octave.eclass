@@ -15,10 +15,10 @@ G_OCTAVE_CAT="${G_OCTAVE_CAT:-main}"
 
 REPO_URI="https://octave.svn.sourceforge.net/svnroot/octave/trunk/octave-forge"
 if [[ ${PV} = 9999* ]]; then
-	inherit subversion autotools base
+	inherit base subversion autotools
 	ESVN_REPO_URI="${REPO_URI}/${G_OCTAVE_CAT}/${PN}"
 else
-	inherit autotools base
+	inherit base autotools
 	SRC_URI="mirror://sourceforge/octave/${P}.tar.gz"
 fi
 
