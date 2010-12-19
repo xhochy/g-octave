@@ -398,7 +398,7 @@ class Cli:
             if os.write(fd, error_log) != len(error_log):
                 out.eerror('Failed to save the traceback!')
             else:
-                out.eerror('Traceback saved to: ' + filename)
+                out.eerror('Traceback saved: ' + filename)
             out.eerror('Please report a bug with traceback and `emerge --info` attached.')
             out.eerror('Bug tracker: ' + self.bug_tracker)
             os.fchmod(fd, 0o777)
