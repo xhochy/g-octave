@@ -56,7 +56,11 @@ class SfUpdates:
     svnroot_url = u'https://octave.svn.sourceforge.net/svnroot/octave/trunk/octave-forge/'
     categories = [u'main', u'extra', u'language', u'nonfree']
     # For some packages guessing may fail, just override it here.
-    pre_guessed_pkgs = {'ncarray': 'extra'}
+    pre_guessed_pkgs = {
+            'gpc': 'nonfree',
+            'ncarray': 'extra',
+            'windows': 'extra'
+            }
 
     _timestamp = None
 
