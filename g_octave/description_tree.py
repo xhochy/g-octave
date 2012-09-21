@@ -3,11 +3,11 @@
 """
     g_octave.description_tree
     ~~~~~~~~~~~~~~~~~~~~~~~~~
-    
+
     This module implements a Python object with the content of a directory
     tree with DESCRIPTION files. The object contains *g_octave.Description*
     objects for each DESCRIPTION file.
-    
+
     :copyright: (c) 2009-2010 by Rafael Goncalves Martins
     :license: GPL-2, see LICENSE for more details.
 """
@@ -32,7 +32,7 @@ config = Config()
 # from http://wiki.python.org/moin/HowTo/Sorting/
 def cmp_to_key(mycmp):
     'Convert a cmp= function into a key= function'
-    
+
     class K(object):
         def __init__(self, obj, *args):
             self.obj = obj
@@ -48,12 +48,12 @@ def cmp_to_key(mycmp):
             return mycmp(self.obj, other.obj) >= 0
         def __ne__(self, other):
             return mycmp(self.obj, other.obj) != 0
-    
+
     return K
 
 
 class DescriptionTree(list):
-    
+
     def __init__(self, parse_sysreq=True):
         log.info('Parsing the package database.')
         list.__init__(self)
@@ -63,7 +63,7 @@ class DescriptionTree(list):
             description = Description(my_file, parse_sysreq=parse_sysreq)
             if description.CAT in self._categories:
                 self.append(description)
-    
+
     def package_versions(self, pn):
         tmp = []
         for pkg in self:
@@ -71,7 +71,7 @@ class DescriptionTree(list):
                 tmp.append(pkg.PV)
         tmp.sort(key=cmp_to_key(vercmp))
         return tmp
-    
+
     def latest_version(self, pn):
         tmp = self.package_versions(pn)
         return (len(tmp) > 0) and tmp[-1] or None
@@ -80,7 +80,7 @@ class DescriptionTree(list):
         tmp = pv_list[:]
         tmp.sort(key=cmp_to_key(vercmp))
         return (len(tmp) > 0) and tmp[-1] or None
-    
+
     def search(self, term):
         # term can be a regular expression
         re_term = re.compile(r'%s' % term)
@@ -103,7 +103,7 @@ class DescriptionTree(list):
             packages[pkg.CAT][pkg.PN].append(pkg.PV)
             packages[pkg.CAT][pkg.PN].sort(key=cmp_to_key(vercmp))
         return packages
-    
+
     def get(self, p):
         for pkg in self:
             if pkg.P == p:
