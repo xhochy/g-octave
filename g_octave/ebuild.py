@@ -3,10 +3,10 @@
 """
     g_octave.ebuild
     ~~~~~~~~~~~~~~~
-    
+
     This module implements a Python class responsible to create the ebuilds
     for the octave-forge packages and track the dependencies correctly.
-    
+
     :copyright: (c) 2009-2010 by Rafael Goncalves Martins
     :license: GPL-2, see LICENSE for more details.
 """
@@ -63,7 +63,7 @@ RDEPEND="${DEPEND}"
 
 PATCHES=( %(patches)s )
 """
-        
+
 METADATA_TEMPLATE = """\
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
@@ -80,14 +80,14 @@ METADATA_TEMPLATE = """\
 
 
 class Ebuild:
-    
+
     def __init__(self, pkg_atom, force=False, scm=False, pkg_manager=None):
-        
+
         self._scm = scm
         self._force = force
         self._pkg_manager = pkg_manager
         self._tree = DescriptionTree()
-        
+
         atom = re_pkg_atom.match(pkg_atom)
         if atom is None:
             pkg_name = pkg_atom
@@ -95,14 +95,14 @@ class Ebuild:
         else:
             pkg_name = atom.group(1)
             version = atom.group(2)
-        
+
         self.description = self._tree.get('%s-%s' % (pkg_name, version))
         if self._scm:
             if self.description is not None:
                 self.description = SvnDescription(self.description.CAT, self.description.PN)
             else:
                 raise GOctaveError('Failed to find the octave-forge category of this package.')
-        
+
         if self.description is None:
             raise GOctaveError('Package not found: %s' % pkg_atom)
 
@@ -110,10 +110,10 @@ class Ebuild:
         ebuild_dir = os.path.join(config.overlay, 'g-octave', self.description.PN)
         ebuild_file = os.path.join(ebuild_dir, self.description.P + '.ebuild')
         metadata_file = os.path.join(ebuild_dir, 'metadata.xml')
-        
+
         if self._force and os.path.exists(ebuild_dir):
             shutil.rmtree(ebuild_dir)
-        
+
         if not os.path.exists(ebuild_file) or self._force:
             if display_info:
                 out.einfo('Creating ebuild: g-octave/' + self.description.P + '.ebuild')
@@ -135,14 +135,14 @@ class Ebuild:
             else:
                 if not nodeps:
                     self._resolve_dependencies()
-    
+
     def _evaluate_ebuild_vars(self, accept_keywords=None):
         if accept_keywords is None:
             accept_keywords = portage.settings['ACCEPT_KEYWORDS']
-        
+
         depend = self.description.depends + self.description.buildrequires + \
             self.description.systemrequirements
-        
+
         ebuild_vars = dict(
             description = self.description.description[:70],
             url = self.description.url,
@@ -152,12 +152,12 @@ class Ebuild:
             depend = self._stringify_list(depend),
             patches = self._stringify_list(self._search_patches())
         )
-        
+
         if len(self.description.description) > 70:
             ebuild_vars['description'] += '...'
-        
+
         return ebuild_vars
-    
+
     def _evaluate_metadata_vars(self):
         try:
             hostname = os.uname()[1]
@@ -167,16 +167,16 @@ class Ebuild:
             username = getpass.getuser(),
             hostname = hostname
         )
-    
+
     def _evaluate_keywords(self, accept_keywords):
         if self._scm:
             return ''
-        
+
         keywords = [i.strip() for i in accept_keywords.split(' ')]
-        
+
         stable = []
         unstable = []
-        
+
         for keyword in keywords:
             match = re_keywords.match(keyword)
             if match == None:
@@ -185,28 +185,28 @@ class Ebuild:
                 stable.append(match.group(2))
             else:
                 unstable.append(match.group(2))
-        
+
         final = ['~'+i for i in unstable]
-        
+
         for keyword in stable:
             if keyword not in unstable:
                 final.append(keyword)
-        
+
         return ' '.join(final)
-    
+
     def _stringify_list(self, my_list):
         if my_list is not None:
             return "\n\t".join(my_list)
         return ''
-    
+
     def _search_patches(self):
-        
+
         patches_dir = os.path.join(config.db, 'patches')
         files_dir = os.path.join(config.overlay, 'g-octave', self.description.PN, 'files')
-        
+
         if not os.path.exists(patches_dir):
             return []
-        
+
         tmp = []
         for patch in os.listdir(patches_dir):
             if re.match(r'^([0-9]{3})_' + self.description.P, patch):
@@ -218,29 +218,29 @@ class Ebuild:
         return tmp
 
     def _resolve_dependencies(self):
-        
+
         to_install = []
         for pkg, comp, version in self.description.self_depends:
-            
+
             # no version required, get the latest available
             if version == None:
                 to_install.append('%s-%s' % (pkg, self._tree.latest_version(pkg)))
                 continue
-            
+
             # here we need to calculate the better version to install
             versions = self._tree.package_versions(pkg)
-            
+
             allowed_versions = []
             for _version in versions:
                 comparation = vercmp(_version, version)
                 if eval('%s %s 0' % (comparation, comp)):
                     allowed_versions.append(_version)
-                
+
             to_install.append('%s-%s' % (pkg, self._tree.version_compare(allowed_versions)))
-            
+
             if len(allowed_versions) == 0:
                 raise GOctaveError('Can\'t resolve a dependency: %s' % pkg)
-        
+
         # creating the ebuilds for the dependencies, recursivelly
         for ebuild in to_install:
             Ebuild(ebuild, force=self._force, pkg_manager=self._pkg_manager, scm=self._scm).create()

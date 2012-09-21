@@ -3,9 +3,9 @@
 """
     g_octave.cli
     ~~~~~~~~~~~~
-    
+
     This module implements a command-line interface for g-octave.
-    
+
     :copyright: (c) 2010 by Rafael Goncalves Martins
     :license: GPL-2, see LICENSE for more details.
 """
@@ -37,24 +37,24 @@ out = portage.output.EOutput()
 
 
 class Cli:
-    
+
     bug_tracker = 'https://bugs.gentoo.org/'
-    
+
     def __init__(self):
         log.info('Initializing g-octave.')
-        
+
         self.parser = argparse.ArgumentParser(
             description='A tool that generates and installs ebuilds for the octave-forge packages'
         )
-        
+
         self.parser.set_defaults(
             action=self.merge,
             scm=(config.use_scm.lower() == 'true')
         )
-        
+
         self.actions = self.parser.add_mutually_exclusive_group()
         self.scm = self.parser.add_mutually_exclusive_group()
-        
+
         self.actions.add_argument(
             '--sync',
             action = 'store_const',
@@ -62,7 +62,7 @@ class Cli:
             dest = 'action',
             help = 'search for updates of the package database, patches and auxiliary files.'
         )
-        
+
         self.actions.add_argument(
             '-l', '--list',
             action = 'store_const',
@@ -70,7 +70,7 @@ class Cli:
             dest = 'action',
             help = 'show a list of packages available to install (separed by categories) and exit.'
         )
-        
+
         self.actions.add_argument(
             '--list-raw',
             action = 'store_const',
@@ -94,7 +94,7 @@ class Cli:
             dest = 'action',
             help = 'try to update a package or all the installed packages, if no atom provided.'
         )
-        
+
         self.actions.add_argument(
             '-s', '--search',
             action = 'store_const',
@@ -102,7 +102,7 @@ class Cli:
             dest = 'action',
             help = 'package search (regular expressions allowed).'
         )
-        
+
         self.actions.add_argument(
             '-C', '--unmerge',
             action = 'store_const',
@@ -110,7 +110,7 @@ class Cli:
             dest = 'action',
             help = 'try to unmerge a package, instead of merge.'
         )
-        
+
         self.actions.add_argument(
             '--config',
             action = 'store_const',
@@ -118,7 +118,7 @@ class Cli:
             dest = 'action',
             help = 'return a value from the configuration file (/etc/g-octave.cfg)'
         )
-        
+
         self.parser.add_argument(
             '-p', '--pretend',
             action = 'store_true',
@@ -181,7 +181,7 @@ class Cli:
             dest = 'colors',
             help = 'don\'t use colors on the CLI'
         )
-        
+
         self.parser.add_argument(
             'atom',
             metavar='ATOM',
@@ -189,15 +189,15 @@ class Cli:
             nargs='?',
             help='Package atom or regular expression (for search) or configuration key'
         )
-    
+
     def _init_tree(self):
         log.info('Initializing DescriptionTree.')
         self.tree = DescriptionTree()
-    
+
     def _required_atom(self):
         if self.args.atom is None:
             self.parser.error('You need to provide a positional argument')
-    
+
     def _init_pkg_manager(self):
         log.info('Initializing Package Manager.')
         pm = get_by_name(config.package_manager)
@@ -205,22 +205,22 @@ class Cli:
             raise GOctaveError('Invalid package manager: %s' % config.package_manager)
         self.pkg_manager = pm(self.args.ask, self.args.verbose, self.args.pretend,
             self.args.oneshot, not self.args.colors)
-            
+
         # checking if the package manager is installed
         if not self.pkg_manager.is_installed():
             raise GOctaveError('Package manager not installed: %s' % config.package_manager)
-        
+
         current_user = getpass.getuser()
         if current_user not in self.pkg_manager.allowed_users():
             raise GOctaveError(
                 'The current user (%s) can\'t run the current selected '
                 'package manager (%s)' % (current_user, config.package_manager)
             )
-        
+
         # checking if the overlay is properly configured
         if not self.pkg_manager.check_overlay(config.overlay, out):
             raise GOctaveError('Overlay not properly configured.')
-    
+
     def _init_ebuild(self):
         log.info('Initializing Ebuild: %s' % self.args.atom)
         self._required_atom()
@@ -230,11 +230,11 @@ class Cli:
             self.pkg_manager)
         self.pkgatom = '=g-octave/' + self.ebuild.description.P
         self.catpkg = 'g-octave/' + self.ebuild.description.PN
-    
+
     def _init_overlay(self):
         log.info('Initializing Overlay.')
         create_overlay(self.args.force_all)
-    
+
     def list(self):
         log.info('Listing packages.')
         self._init_tree()
@@ -258,7 +258,7 @@ class Cli:
                     portage.output.red(', '.join(packages[category][pkg]))
                 )
                 print()
-    
+
     def list_raw(self):
         log.info('Listing packages (raw mode).')
         self._init_tree()
@@ -266,7 +266,7 @@ class Cli:
         for cat in packages:
             for pkg in packages[cat]:
                 print(pkg)
-    
+
     def info(self):
         log.info('Listing description of a package.')
         self._init_ebuild()
@@ -279,7 +279,7 @@ class Cli:
         print(portage.output.blue('Categories:'), portage.output.white(str(pkg.categories)))
         print(portage.output.blue('License:'), portage.output.white(str(pkg.license)))
         print(portage.output.blue('Url:'), portage.output.white(str(pkg.url)))
-    
+
     def update(self):
         self._init_pkg_manager()
         if self.args.atom is not None:
@@ -291,7 +291,7 @@ class Cli:
             ret = self.pkg_manager.update_package()
         if ret != os.EX_OK:
             raise GOctaveError('Update failed!')
-    
+
     def search(self):
         self._init_tree()
         self._init_overlay()
@@ -314,7 +314,7 @@ class Cli:
                 portage.output.red(', '.join(packages[pkg]))
             )
             print()
-    
+
     def merge(self):
         self._init_pkg_manager()
         self._init_ebuild()
@@ -324,7 +324,7 @@ class Cli:
         ret = self.pkg_manager.install_package(self.pkgatom, self.catpkg)
         if ret != os.EX_OK:
             raise GOctaveError('Merge failed!')
-    
+
     def unmerge(self):
         self._init_pkg_manager()
         self._init_ebuild()
@@ -334,14 +334,14 @@ class Cli:
         ret = self.pkg_manager.uninstall_package(self.pkgatom, self.catpkg)
         if ret != os.EX_OK:
             raise GOctaveError('Unmerge failed!')
-    
+
     def sync(self):
         log.info('Searching updates ...')
         out.einfo('Searching updates ...')
-        
+
         if self.args.force and os.path.exists(config.db):
             shutil.rmtree(config.db)
-        
+
         if not self.updates.fetch_db():
             log.info('No updates available')
             out.einfo('No updates available')
@@ -357,20 +357,20 @@ class Cli:
                 if os.path.exists(config.db):
                     shutil.rmtree(config.db)
                 raise GOctaveError('Package database SHA1 checksum failed!')
-    
+
     def config(self):
         log.info('Retrieving configuration option.')
         self._required_atom()
         print(config.__getattr__(self.args.atom))
-    
+
     def _run(self):
         log.info('Running the command-line interface.')
         self.args = self.parser.parse_args()
         if not self.args.colors:
             portage.output.nocolor()
-        
+
         self.updates = fetch()
-        
+
         # validating the db_mirror
         if self.updates is None:
             raise GOctaveError('Your db_mirror value is invalid. Fix it, or leave empty to use the default.')
@@ -378,10 +378,10 @@ class Cli:
         # checking if we have a package database
         if self.updates.need_update() and self.args.action != self.sync:
             raise GOctaveError('No package database found! Please run `g-octave --sync`')
-        
+
         self.args.action()
         return os.EX_OK
-    
+
     def run(self):
         try:
             return self._run()

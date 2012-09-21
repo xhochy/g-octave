@@ -51,24 +51,24 @@ conf = Config()
 re_depends = re.compile(r'^([a-zA-Z0-9-]+) *(\( *([><=]?=?) *([0-9.]+) *\))?')
 
 # we'll use atoms like 'control-1.0.11' for g-octave packages
-re_pkg_atom = re.compile(r'^(.+)-([0-9.]+)$') 
+re_pkg_atom = re.compile(r'^(.+)-([0-9.]+)$')
 
 # pattern for DESCRIPTION filenames
-re_desc_file = re.compile(r'^((.+)-([0-9.]+))\.DESCRIPTION$') 
+re_desc_file = re.compile(r'^((.+)-([0-9.]+))\.DESCRIPTION$')
 
 
 class Description(object):
-    
+
     # gentoo ebuild variables
     P = None
     PN = None
     PV = None
     CAT = None
-    
+
     _categories = ['main', 'extra', 'language', 'nonfree']
-    
+
     def __init__(self, file, parse_sysreq=True):
-        
+
         log.info('Parsing file: %s' % file)
 
         if not os.path.exists(file):
@@ -77,17 +77,17 @@ class Description(object):
 
         self._file = file
         self._info = Info(os.path.join(conf.db, 'info.json'))
-        
+
         my_atom = re_desc_file.match(os.path.basename(self._file))
         if my_atom is not None:
             self.P = my_atom.group(1)
             self.PN = my_atom.group(2)
             self.PV = my_atom.group(3)
-        
+
         file_parts = self._file.split(os.sep)
         if len(file_parts) >= 3 and file_parts[-3] in self._categories:
             self.CAT = file_parts[-3]
-        
+
         # dictionary with the parsed content of the DESCRIPTION file
         self._desc = dict()
 
@@ -96,7 +96,7 @@ class Description(object):
 
         with open(file, 'rb') as fp:
             for line in fp:
-                
+
                 line = line.decode('iso-8859-15')
                 line_splited = line.split(':')
 
@@ -156,7 +156,7 @@ class Description(object):
 
         # add the 'self_depends' key
         self._desc['self_depends'] = list()
-        
+
         # add the 'gentoo_license' key
         self._desc['license_gentoo'] = ''
 
@@ -172,7 +172,7 @@ class Description(object):
             # requirements
             if key in ('systemrequirements', 'buildrequires') and parse_sysreq:
                 self._desc[key] = self._parse_depends(self._desc[key])
-            
+
             # license
             if key == 'license':
                 try:
@@ -296,9 +296,9 @@ class Description(object):
 
 
 class SvnDescription(Description):
-    
+
     _url = 'https://octave.svn.sourceforge.net/svnroot/octave/trunk/octave-forge'
-    
+
     def __init__(self, category, package):
         temp_desc = tempfile.mkstemp()[1]
         desc_url = '%s/%s/%s/DESCRIPTION' % (

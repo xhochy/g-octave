@@ -3,10 +3,10 @@
 """
     g_octave.checksum
     ~~~~~~~~~~~~~~~~~
-    
+
     This module implements functions for compute/generate SHA1 checksums
     for DESCRIPTION files.
-    
+
     :copyright: (c) 2010 by Rafael Goncalves Martins
     :license: GPL-2, see LICENSE for more details.
 """

@@ -48,10 +48,10 @@ class Config(object):
     def __init__(self, config_file=None):
         # config Parser
         self._config = configparser.ConfigParser(self._defaults)
-        
+
         # current directory
         cwd = os.path.dirname(os.path.realpath(__file__))
-        
+
         # no configuration file provided as parameter
         if config_file is None:
             # we just want one of the following configuration files:
@@ -60,16 +60,16 @@ class Config(object):
                 os.path.join('/etc', 'g-octave.cfg'),
                 os.path.join(cwd, '..', 'etc', 'g-octave.cfg'),
             ]
-            
+
             # get the first one available
             for my_file in available_files:
                 if os.path.exists(my_file):
                     config_file = my_file
                     break
-        
+
         # parse the wanted file using ConfigParser
         parsed_files = self._config.read(config_file)
-        
+
         # no file to parsed
         if len(parsed_files) == 0:
             raise GOctaveError('File not found: %r' % config_file)

@@ -3,12 +3,12 @@
 """
     g_octave.fetch
     ~~~~~~~~~~~~~~
-    
+
     This module implements a Python class responsible to fetch and update
     the package database and the auxiliary files.
-    
+
     Used only by the live version of g-octave.
-    
+
     :copyright: (c) 2009-2010 by Rafael Goncalves Martins
     :license: GPL-2, see LICENSE for more details.
 """
@@ -49,20 +49,20 @@ def clean_db():
             os.unlink(current)
 
 class GitHub:
-    
+
     re_db_mirror = re.compile(r'github://(?P<user>[^/]+)/(?P<repo>[^/]+)/?')
-    
+
     def __init__(self, user, repo):
         self.user = user
         self.repo = repo
         self.api_url = 'http://github.com/api/v2/json'
         self.url = 'http://github.com'
-    
+
     def need_update(self):
         return not os.path.exists(os.path.join(
             conf.db, 'cache', 'commit_id'
         ))
-    
+
     def get_commits(self, branch='master'):
         url = '%s/commits/list/%s/%s/%s/' % (
             self.api_url,
@@ -77,7 +77,7 @@ class GitHub:
             return commits['commits']
         except:
             raise GOctaveError('Failed to fetch the package database. Please check your internet connection.')
-    
+
     def fetch_db(self, branch='master'):
         cache = os.path.join(conf.db, 'cache')
         commit_id = os.path.join(cache, 'commit_id')
