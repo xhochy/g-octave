@@ -55,6 +55,8 @@ class SfUpdates:
 
     svnroot_url = u'https://octave.svn.sourceforge.net/svnroot/octave/trunk/octave-forge/'
     categories = [u'main', u'extra', u'language', u'nonfree']
+    # For some packages guessing may fail, just override it here.
+    pre_guessed_pkgs = {'ncarray': 'extra'}
 
     _timestamp = None
 
@@ -70,16 +72,18 @@ class SfUpdates:
 
     def _compute_manifest(self, db_dir):
         manifest = {}
-        for category in self._db.pkg_list:
-            for pkg in self._db.pkg_list[category]:
-                description = os.path.join(
-                    db_dir,
-                    'octave-forge',
-                    self._db.categories[pkg['name']],
-                    pkg['name'],
-                    '%s-%s.DESCRIPTION' % (pkg['name'], pkg['version'])
-                )
-                manifest[pkg['name']+'-'+pkg['version']] = sha1_compute(description)
+        packages = self._db.list()
+        for category in packages.iterkeys():
+            for pkg in packages[category].iterkeys():
+                for version in packages[category][pkg]:
+                    description = os.path.join(
+                        db_dir,
+                        'octave-forge',
+                        str(category),
+                        pkg,
+                        '%s-%s.DESCRIPTION' % (pkg, version)
+                    )
+                    manifest[pkg + '-' + version] = sha1_compute(description)
         try:
             with open(os.path.join(self._repo_dir, 'manifest.json'), 'w') as fp:
                 json.dump(manifest, fp, indent=2, sort_keys=True)
@@ -132,16 +136,20 @@ class SfUpdates:
         #   category
         # }
         entries = {}
-        for category in self._db.pkg_list:
-            for pkg in self._db.pkg_list[category]:
-                entries['%s-%s.tar.gz' % (pkg['name'], pkg['version'])] = {
-                    'name': pkg['name'],
-                    'version': pkg['version'],
-                    'category': unicode(self._db.categories[pkg['name']]),
-                }
+        packages = self._db.list()
+        for category in packages.iterkeys():
+            for pkg in packages[category].iterkeys():
+                for version in packages[category][pkg]:
+                    entries['%s-%s.tar.gz' % (pkg, version)] = {
+                        'name': pkg,
+                        'version': version,
+                        'category': unicode(category),
+                    }
         return entries
 
     def guess_category(self, pkgname):
+        if pkgname in self.pre_guessed_pkgs:
+            return self.pre_guessed_pkgs[pkgname]
         for category in self.categories:
             f = urllib.urlopen(self.svnroot_url + '/' + category + '/' + pkgname + '/DESCRIPTION')
             if f.getcode() == 200:
@@ -170,7 +178,7 @@ class SfUpdates:
         return updates
 
     def download(self, tarball_name, entry):
-        cat_dir = os.path.join(self._local_dir, entry['category'])
+        cat_dir = os.path.join(self._local_dir, str(entry['category']))
         file_path = os.path.join(cat_dir, tarball_name)
         if not os.path.exists(cat_dir):
             os.makedirs(cat_dir, 0o755)
@@ -191,7 +199,7 @@ class SfUpdates:
             description = os.path.join(
                 db_dir,
                 'octave-forge',
-                entry['category'],
+                str(entry['category']),
                 entry['name'],
                 '%s-%s.DESCRIPTION' % (entry['name'], entry['version'])
             )
@@ -200,7 +208,7 @@ class SfUpdates:
                     os.makedirs(os.path.dirname(description))
                 tarball = os.path.join(
                     self._local_dir,
-                    entry['category'],
+                    str(entry['category']),
                     tarball_name
                 )
                 with closing(tarfile.open(tarball, 'r:gz')) as src_tar:
